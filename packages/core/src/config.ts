@@ -68,7 +68,7 @@ export function resolveConfig<Theme extends object = object>(
   defaults: UserConfigDefaults<Theme> = {},
 ): ResolvedConfig<Theme> {
   const config = Object.assign({}, defaults, userConfig) as UserConfigDefaults<Theme>
-  const rawPresets = uniqueBy((config.presets || []).flatMap(toArray).flatMap(resolvePresets), (a, b) => a.name === b.name)
+  const rawPresets = uniqueBy((config.presets || []).flatMap(toArray).flatMap(resolvePresets).reverse(), (a, b) => a.name === b.name).reverse()
 
   const sortedPresets = [
     ...rawPresets.filter(p => p.enforce === 'pre'),

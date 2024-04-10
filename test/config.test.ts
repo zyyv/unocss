@@ -146,7 +146,7 @@ describe('config', () => {
       ],
     })
 
-    expect(unoA.config.presets.map(i => i.name)).toEqual(['presetA', 'presetB'])
+    expect(unoA.config.presets.map(i => i.name)).toEqual(['presetB', 'presetA'])
 
     const unoB = createGenerator({
       presets: [
@@ -156,7 +156,36 @@ describe('config', () => {
       ],
     })
 
-    expect(unoB.config.presets.map(i => i.name)).toEqual(['presetA', 'presetB', 'presetC'])
+    expect(unoB.config.presets.map(i => i.name)).toEqual(['presetB', 'presetC', 'presetA'])
+  })
+
+  it('uniq presets override before', async () => {
+    const presetA: Preset = {
+      name: 'presetA',
+      rules: [['foo-bar', { color: '#000' }]],
+    }
+    const overrideA: Preset = {
+      name: 'presetA',
+      rules: [['foo-bar', { color: '#fff' }]],
+    }
+    const nestedOverrideA: Preset = { name: 'presetC', presets: [overrideA] }
+
+    const uno = createGenerator({
+      presets: [
+        presetA,
+        overrideA,
+      ],
+    })
+
+    const uno2 = createGenerator({
+      presets: [
+        presetA,
+        nestedOverrideA,
+      ],
+    })
+
+    expect((await uno.generate('foo-bar')).css).toContain('#fff')
+    expect((await uno2.generate('foo-bar')).css).toContain('#fff')
   })
 })
 
